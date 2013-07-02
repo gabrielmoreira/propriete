@@ -21,7 +21,7 @@ The Propriete library is available from [Maven Central](http://search.maven.org/
 <dependency>
   <groupId>com.github.gabrielmoreira</groupId>
   <artifactId>propriete</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -30,16 +30,18 @@ The Propriete library is available from [Maven Central](http://search.maven.org/
 ### Simple example
 
 ```java
-public interface AppConfig {
+public interface Sample {
    @ConfigProperty(name="hello")
    public String greeting();
 }
+```
+```java
+Properties properties = new Properties();
+properties.put("hello", "World!");
 
-// ... initialize propriete ...
+Sample sample = Propriete.getInstance(Sample.class, properties);
 
-AppConfig appConfig = propriete.getInstance(AppConfig.class);
-
-assertEquals("World!", appConfig.greeting());
+assertEquals("World!", sample.value());
 ```
 
 ## Bugs and Feature requests

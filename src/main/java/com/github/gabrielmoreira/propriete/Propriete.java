@@ -1,6 +1,11 @@
 package com.github.gabrielmoreira.propriete;
 
 import java.lang.reflect.Proxy;
+import java.util.Properties;
+
+import com.github.gabrielmoreira.propriete.converter.SimpleConverter;
+import com.github.gabrielmoreira.propriete.source.ConfigSource;
+import com.github.gabrielmoreira.propriete.source.PropertiesConfigSource;
 
 public class Propriete {
 
@@ -10,8 +15,24 @@ public class Propriete {
 		this.configContext = configContext;
 	}
 
+	public Propriete(ConfigSource configSource) {
+		this(new ConfigContext(configSource, new SimpleConverter()));
+	}
+
+	public Propriete(Properties properties) {
+		this(new PropertiesConfigSource(properties));
+	}
+
 	public static <T> T getInstance(Class<T> configType, ConfigContext configContext) {
 		return new Propriete(configContext).getInstance(configType);
+	}
+
+	public static <T> T getInstance(Class<T> configType, ConfigSource configSource) {
+		return new Propriete(configSource).getInstance(configType);
+	}
+
+	public static <T> T getInstance(Class<T> configType, Properties properties) {
+		return new Propriete(properties).getInstance(configType);
 	}
 
 	public <T> T getInstance(Class<T> configType) {

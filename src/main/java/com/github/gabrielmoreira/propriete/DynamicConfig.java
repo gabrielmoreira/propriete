@@ -94,8 +94,8 @@ public class DynamicConfig implements InvocationHandler {
 			Object object = configContext.get(propertyKey);
 			if (object == null)
 				object = defaultValue;
-			if (object == null && required) {
-				throw new RuntimeException("Property '" + propertyKey + "' not found!");
+			if (object == null && (required || this.propertyType.isPrimitive())) {
+				throw new RequiredPropertyException("Property '" + propertyKey + "' not found!");
 			}
 			return object == null ? null : configContext.convert(object, propertyType);
 		}
@@ -163,7 +163,7 @@ public class DynamicConfig implements InvocationHandler {
 				try {
 					CONFIG_PROPERTY = Defaults.class.getDeclaredMethod("getDefaultConfigProperty").getAnnotation(ConfigProperty.class);
 				} catch (Exception e) {
-					throw new RuntimeException(e);
+					throw new ProprieteException(e);
 				}
 			}
 			return CONFIG_PROPERTY;
