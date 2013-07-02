@@ -2,13 +2,19 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.gabrielmoreira</groupId>
 	<artifactId>propriete</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>3.2.3.RELEASE</version>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<properties>
