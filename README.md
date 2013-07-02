@@ -2,7 +2,7 @@ Propriete is a Java library for abstracting configurations using Java Interface.
 
 ## Usage
 
-The Propriete library is available from [Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.github.kevinsawicki%22%20AND%20a%3A%22http-request%22).
+The Propriete library is available for maven users:
 
 ```xml
 <repositories>
