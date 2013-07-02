@@ -44,6 +44,8 @@ Sample sample = Propriete.getInstance(Sample.class, properties);
 assertEquals("World!", sample.value());
 ```
 
+See more samples [ProprieteTest.java](https://github.com/gabrielmoreira/propriete/blob/master/src/test/java/com/github/gabrielmoreira/propriete/ProprieteTest.java)
+
 ## Bugs and Feature requests
 
 You can register bugs and feature requests in the [Github Issue Tracker](https://github.com/gabrielmoreira/propriete/issues).
