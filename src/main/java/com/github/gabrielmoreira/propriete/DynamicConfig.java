@@ -1,5 +1,7 @@
 package com.github.gabrielmoreira.propriete;
 
+import static com.github.gabrielmoreira.propriete.Strings.*;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ public class DynamicConfig implements InvocationHandler {
 	private ConfigContext configContext;
 	private Class<?> type;
 	private String path;
+	private String delimiter = ".";
 	private Map<Method, ExecutionHandler> executionHandlers = new HashMap<Method, ExecutionHandler>();
 
 	public DynamicConfig(ConfigContext configContext, Class<?> type) {
@@ -48,12 +51,12 @@ public class DynamicConfig implements InvocationHandler {
 	}
 
 	private ExecutionHandler createExecutionHandler(Method method) {
-		ConfigMethodAdapter configMethodAdapter = new ConfigMethodAdapter(method);
-		if (configMethodAdapter.isConfigurationType())
-			return new GetDynamicConfigExecutionHandler(configMethodAdapter);
-		if (configMethodAdapter.isSection())
-			return new GetSectionConfigExecutionHandler(configMethodAdapter);
-		return new GetPropertyExecutionHandler(configMethodAdapter);
+		PropertyConfigAdapter propertyConfigAdapter = new PropertyConfigAdapter(method);
+		if (propertyConfigAdapter.isConfigurationType())
+			return new GetDynamicConfigExecutionHandler(propertyConfigAdapter);
+		if (propertyConfigAdapter.isSection())
+			return new GetSectionConfigExecutionHandler(propertyConfigAdapter);
+		return new GetPropertyExecutionHandler(propertyConfigAdapter);
 	}
 
 	private interface ExecutionHandler {
@@ -63,17 +66,17 @@ public class DynamicConfig implements InvocationHandler {
 	private class GetDynamicConfigExecutionHandler implements ExecutionHandler {
 		private Object instance;
 
-		public GetDynamicConfigExecutionHandler(ConfigMethodAdapter configMethodAdapter) {
-			DynamicConfig dynamicConfig = new DynamicConfig(configContext, configMethodAdapter.getType(), getChildPath(configMethodAdapter), getName(configMethodAdapter));
+		public GetDynamicConfigExecutionHandler(PropertyConfigAdapter propertyConfigAdapter) {
+			DynamicConfig dynamicConfig = new DynamicConfig(configContext, propertyConfigAdapter.getType(), getChildPath(propertyConfigAdapter), getName(propertyConfigAdapter));
 			this.instance = new Propriete(configContext).getInstance(dynamicConfig);
 		}
 
-		protected String getName(ConfigMethodAdapter configMethodAdapter) {
-			return configMethodAdapter.getDefinedKey() == null ? configMethodAdapter.getDefinedName() : "";
+		protected String getName(PropertyConfigAdapter propertyConfigAdapter) {
+			return propertyConfigAdapter.getDefinedKey() == null ? propertyConfigAdapter.getDefinedName() : "";
 		}
 
-		protected String getChildPath(ConfigMethodAdapter configMethodAdapter) {
-			String childPath = configMethodAdapter.getDefinedKey();
+		protected String getChildPath(PropertyConfigAdapter propertyConfigAdapter) {
+			String childPath = propertyConfigAdapter.getDefinedKey();
 			return childPath != null ? childPath : path;
 		}
 
@@ -86,9 +89,9 @@ public class DynamicConfig implements InvocationHandler {
 		private String propertyKey;
 		private String propertyNewKeyPrefix;
 
-		public GetSectionConfigExecutionHandler(ConfigMethodAdapter configMethodAdapter) {
-			this.propertyKey = configMethodAdapter.getKey();
-			this.propertyNewKeyPrefix = configMethodAdapter.getNewKeyPrefix();
+		public GetSectionConfigExecutionHandler(PropertyConfigAdapter propertyConfigAdapter) {
+			this.propertyKey = propertyConfigAdapter.getKey();
+			this.propertyNewKeyPrefix = propertyConfigAdapter.getNewKeyPrefix();
 		}
 
 		public Object execute(Object[] args) {
@@ -116,11 +119,11 @@ public class DynamicConfig implements InvocationHandler {
 		private boolean required;
 		private String defaultValue;
 
-		public GetPropertyExecutionHandler(ConfigMethodAdapter configMethodAdapter) {
-			this.propertyKey = configMethodAdapter.getKey();
-			this.propertyType = configMethodAdapter.getType();
-			this.required = configMethodAdapter.isRequired();
-			this.defaultValue = configMethodAdapter.getDefaultValue();
+		public GetPropertyExecutionHandler(PropertyConfigAdapter propertyConfigAdapter) {
+			this.propertyKey = propertyConfigAdapter.getKey();
+			this.propertyType = propertyConfigAdapter.getType();
+			this.required = propertyConfigAdapter.isRequired();
+			this.defaultValue = propertyConfigAdapter.getDefaultValue();
 		}
 
 		public Object execute(Object[] args) {
@@ -134,11 +137,11 @@ public class DynamicConfig implements InvocationHandler {
 		}
 	}
 
-	private class ConfigMethodAdapter {
+	private class PropertyConfigAdapter {
 
 		private Method method;
 
-		public ConfigMethodAdapter(Method method) {
+		public PropertyConfigAdapter(Method method) {
 			this.method = method;
 		}
 
@@ -216,41 +219,12 @@ public class DynamicConfig implements InvocationHandler {
 		}
 	}
 
-	protected static String buildPath(String... segments) {
-		if (segments == null)
-			return "";
-		String path = "";
-		for (String segment : segments) {
-			path = concatPathSegment(path, segment);
-		}
-		if (path.equals(".") || path.isEmpty())
-			return "";
-		return path.substring(1);
-	}
-
-	protected static String concatPathSegment(String path, String pathSegment) {
-		if (pathSegment != null && !pathSegment.isEmpty()) {
-			path += "." + pathSegment;
-		}
-		return path;
-	}
-
-	protected static String normalize(String value) {
-		return isNull(value) ? null : value;
-	}
-
-	protected static boolean isNull(String value) {
-		return value == null || Propriete.DEFAULT_NULL_STRING_VALUE.equals(value);
-	}
-
-	protected static String toJavaBeanName(String propertyName) {
-		if (propertyName.length() > 3 && propertyName.startsWith("get") && Character.isUpperCase(propertyName.charAt(3)))
-			propertyName = propertyName.substring(3, 4).toLowerCase() + propertyName.substring(4);
-		return propertyName;
-	}
-
 	public Class<?> getType() {
 		return type;
+	}
+
+	private String buildPath(String... segments) {
+		return Strings.buildPath(delimiter, segments);
 	}
 
 }
