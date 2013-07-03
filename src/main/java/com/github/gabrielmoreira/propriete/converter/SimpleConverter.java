@@ -1,13 +1,14 @@
 package com.github.gabrielmoreira.propriete.converter;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.github.gabrielmoreira.propriete.ProprieteException;
 
 public class SimpleConverter implements Converter {
 
@@ -43,7 +44,7 @@ public class SimpleConverter implements Converter {
 		Converter converter = getConverterForKey(new Key(wrap(object.getClass()), wrap(toType)));
 		if (converter != null)
 			return converter.convert(object, toType);
-		throw new RuntimeException("Unsupported conversion from " + object.getClass() + " to " + toType);
+		throw new ProprieteException("Unsupported conversion from " + object.getClass() + " to " + toType);
 	}
 
 	private Converter getConverterForKey(Key key) {
@@ -121,12 +122,8 @@ public class SimpleConverter implements Converter {
 		public Object convert(Object object, Class<?> toType) {
 			try {
 				return method.invoke(null, object);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalArgumentException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
+			} catch (Exception e) {
+				throw new ProprieteException(e);
 			}
 		}
 	}
@@ -141,14 +138,8 @@ public class SimpleConverter implements Converter {
 		public Object convert(Object object, Class<?> toType) {
 			try {
 				return constructor.newInstance(object);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalArgumentException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
+			} catch (Exception e) {
+				throw new ProprieteException(e);
 			}
 		}
 	}

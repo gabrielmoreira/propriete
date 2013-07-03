@@ -9,12 +9,29 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigProperty {
 
-	String key() default "!$!#null#!$!";
+	/**
+	 * Absolute property name
+	 */
+	String key() default Propriete.DEFAULT_NULL_STRING_VALUE;
 
-	String name() default "!$!#null#!$!";
+	/**
+	 * Relative property name 
+	 */
+	String name() default Propriete.DEFAULT_NULL_STRING_VALUE;
 
-	String defaultValue() default "!$!#null#!$!";
+	/**
+	 * Default property value
+	 */
+	String defaultValue() default Propriete.DEFAULT_NULL_STRING_VALUE;
 
-	boolean required() default false;
+	/**
+	 * Property is optional? 
+	 */
+	boolean optional() default false;
+
+	/**
+	 * New key property prefix
+	 */
+	String newKeyPrefix() default Propriete.DEFAULT_NULL_STRING_VALUE;
 
 }

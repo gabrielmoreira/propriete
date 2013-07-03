@@ -4,6 +4,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
 public class DynamicConfig implements InvocationHandler {
 
@@ -48,6 +51,8 @@ public class DynamicConfig implements InvocationHandler {
 		ConfigMethodAdapter configMethodAdapter = new ConfigMethodAdapter(method);
 		if (configMethodAdapter.isConfigurationType())
 			return new GetDynamicConfigExecutionHandler(configMethodAdapter);
+		if (configMethodAdapter.isSection())
+			return new GetSectionConfigExecutionHandler(configMethodAdapter);
 		return new GetPropertyExecutionHandler(configMethodAdapter);
 	}
 
@@ -77,17 +82,45 @@ public class DynamicConfig implements InvocationHandler {
 		}
 	}
 
+	private class GetSectionConfigExecutionHandler implements ExecutionHandler {
+		private String propertyKey;
+		private String propertyNewKeyPrefix;
+
+		public GetSectionConfigExecutionHandler(ConfigMethodAdapter configMethodAdapter) {
+			this.propertyKey = configMethodAdapter.getKey();
+			this.propertyNewKeyPrefix = configMethodAdapter.getNewKeyPrefix();
+		}
+
+		public Object execute(Object[] args) {
+			Set<Entry<String, Object>> entries = configContext.filterStartWith(propertyKey);
+			return asProperties(entries);
+		}
+
+		private Properties asProperties(Set<Entry<String, Object>> entries) {
+			Properties properties = new Properties();
+			for (Entry<String, Object> entry : entries) {
+				String key = propertyNewKeyPrefix == null ? entry.getKey() : getKey(entry.getKey());
+				properties.put(key, entry.getValue());
+			}
+			return properties;
+		}
+
+		private String getKey(String key) {
+			return buildPath(propertyNewKeyPrefix, key.substring(propertyKey.length() + 1));
+		}
+	}
+
 	private class GetPropertyExecutionHandler implements ExecutionHandler {
-		private String propertyKey = "";
-		private String defaultValue;
-		private boolean required;
+		private String propertyKey;
 		private Class<?> propertyType;
+		private boolean required;
+		private String defaultValue;
 
 		public GetPropertyExecutionHandler(ConfigMethodAdapter configMethodAdapter) {
 			this.propertyKey = configMethodAdapter.getKey();
-			this.defaultValue = configMethodAdapter.getDefaultValue();
 			this.propertyType = configMethodAdapter.getType();
 			this.required = configMethodAdapter.isRequired();
+			this.defaultValue = configMethodAdapter.getDefaultValue();
 		}
 
 		public Object execute(Object[] args) {
@@ -109,8 +142,17 @@ public class DynamicConfig implements InvocationHandler {
 			this.method = method;
 		}
 
+		public boolean isSection() {
+			Class<?> type = getType();
+			if (type.isAssignableFrom(Properties.class))
+				return true;
+			if (type.isAssignableFrom(Map.class))
+				return true;
+			return false;
+		}
+
 		public boolean isRequired() {
-			return getConfigProperty().required();
+			return !getConfigProperty().optional();
 		}
 
 		public Class<?> getType() {
@@ -133,6 +175,10 @@ public class DynamicConfig implements InvocationHandler {
 
 		public String getDefinedName() {
 			return normalize(getConfigProperty().name());
+		}
+
+		public String getNewKeyPrefix() {
+			return normalize(getConfigProperty().newKeyPrefix());
 		}
 
 		public String getKey() {
@@ -194,7 +240,7 @@ public class DynamicConfig implements InvocationHandler {
 	}
 
 	protected static boolean isNull(String value) {
-		return value == null || "!$!#null#!$!".equals(value);
+		return value == null || Propriete.DEFAULT_NULL_STRING_VALUE.equals(value);
 	}
 
 	protected static String toJavaBeanName(String propertyName) {

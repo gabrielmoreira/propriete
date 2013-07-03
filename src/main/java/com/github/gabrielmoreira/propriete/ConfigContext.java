@@ -1,5 +1,8 @@
 package com.github.gabrielmoreira.propriete;
 
+import java.util.Map.Entry;
+import java.util.Set;
+
 import com.github.gabrielmoreira.propriete.converter.Converter;
 import com.github.gabrielmoreira.propriete.source.ConfigSource;
 
@@ -19,6 +22,10 @@ public class ConfigContext {
 
 	public Object convert(Object object, Class<?> propertyType) {
 		return converter.convert(object, propertyType);
+	}
+
+	public Set<Entry<String, Object>> filterStartWith(String prefix) {
+		return configSource.filterStartWith(prefix);
 	}
 
 }

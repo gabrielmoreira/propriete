@@ -9,6 +9,8 @@ import com.github.gabrielmoreira.propriete.source.PropertiesConfigSource;
 
 public class Propriete {
 
+	static final String DEFAULT_NULL_STRING_VALUE = "!$!#null#!$!";
+
 	private ConfigContext configContext;
 
 	public Propriete(ConfigContext configContext) {
