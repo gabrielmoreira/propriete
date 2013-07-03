@@ -21,7 +21,7 @@ The Propriete library is available for maven users:
 <dependency>
   <groupId>com.github.gabrielmoreira</groupId>
   <artifactId>propriete</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
 </dependency>
 ```
 

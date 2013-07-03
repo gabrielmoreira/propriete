@@ -103,7 +103,7 @@ public class DynamicConfig implements InvocationHandler {
 			Properties properties = new Properties();
 			for (Entry<String, Object> entry : entries) {
 				String key = propertyNewKeyPrefix == null ? entry.getKey() : getKey(entry.getKey());
-				properties.put(key, entry.getValue());
+				properties.put(key, configContext.resolvePlaceholders(entry.getValue()));
 			}
 			return properties;
 		}
@@ -133,7 +133,7 @@ public class DynamicConfig implements InvocationHandler {
 			if (object == null && (required || this.propertyType.isPrimitive())) {
 				throw new RequiredPropertyException("Property '" + propertyKey + "' not found!");
 			}
-			return object == null ? null : configContext.convert(object, propertyType);
+			return object == null ? null : configContext.convert(configContext.resolvePlaceholders(object), propertyType);
 		}
 	}
 

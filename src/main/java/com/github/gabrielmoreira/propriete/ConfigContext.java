@@ -4,16 +4,23 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.github.gabrielmoreira.propriete.converter.Converter;
+import com.github.gabrielmoreira.propriete.placeholder.ConfigPlaceholderResolver;
 import com.github.gabrielmoreira.propriete.source.ConfigSource;
 
 public class ConfigContext {
 
+	private ConfigPlaceholderResolver placeholderResolver;
 	private ConfigSource configSource;
 	private Converter converter;
 
 	public ConfigContext(ConfigSource configSource, Converter converter) {
 		this.configSource = configSource;
 		this.converter = converter;
+	}
+
+	public ConfigContext(ConfigSource configSource, Converter converter, ConfigPlaceholderResolver configPlaceholderResolver) {
+		this(configSource, converter);
+		this.placeholderResolver = configPlaceholderResolver;
 	}
 
 	public Object get(String propertyKey) {
@@ -26,6 +33,12 @@ public class ConfigContext {
 
 	public Set<Entry<String, Object>> filterStartWith(String prefix) {
 		return configSource.filterStartWith(prefix);
+	}
+
+	public Object resolvePlaceholders(Object value) {
+		if (placeholderResolver != null)
+			return placeholderResolver.resolvePlaceholders(this, value);
+		return value;
 	}
 
 }
