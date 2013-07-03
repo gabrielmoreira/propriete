@@ -1,8 +1,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<name>Propriete</name>
+	<description>Propriete is a Java library for abstracting configurations using Java Interface. Heavily inspired by excelent [GWT Constants](http://www.gwtproject.org/doc/latest/DevGuideI18nConstants.html).</description>
+	<url>http://github.com/gabrielmoreira/propriete</url>
+
 	<groupId>com.github.gabrielmoreira</groupId>
 	<artifactId>propriete</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
+
+	<scm>
+		<connection>scm:git:git@github.com:gabrielmoreira/propriete.git</connection>
+		<developerConnection>scm:git:git@github.com:gabrielmoreira/propriete.git</developerConnection>
+		<url>git@github.com:gabrielmoreira/propriete.git</url>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub ${project.artifactId} Repository</name>
+			<url>https://raw.github.com/gabrielmoreira/${project.artifactId}/mvn-repo</url>
+		</repository>
+	</distributionManagement>
+
+	<properties>
+		<github.global.server>github</github.global.server>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -17,11 +40,17 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<properties>
-		<github.global.server>github</github.global.server>
-	</properties>
+
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.8.1</version>
+				<configuration>
+					<tag>${project.artifactId}-${project.version}</tag>
+					<pushChanges>false</pushChanges>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.7</version>
@@ -34,18 +63,17 @@
 				<artifactId>site-maven-plugin</artifactId>
 				<version>0.8</version>
 				<configuration>
-					<message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-					<noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-					<branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+					<message>Maven artifacts for ${project.version}</message>
+					<noJekyll>true</noJekyll>
+					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+					<branch>refs/heads/mvn-repo</branch>
 					<includes>
 						<include>**/*</include>
 					</includes>
-					<repositoryName>propriete</repositoryName>      <!-- github repo name -->
-					<repositoryOwner>gabrielmoreira</repositoryOwner>    <!-- github username  -->
+					<repositoryName>propriete</repositoryName>
+					<repositoryOwner>gabrielmoreira</repositoryOwner>
 				</configuration>
 				<executions>
-              		<!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
 					<execution>
 						<goals>
 							<goal>site</goal>
@@ -57,14 +85,4 @@
 		</plugins>
 	</build>
 
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub ${project.artifactId} Repository</name>
-			<url>https://raw.github.com/gabrielmoreira/${project.artifactId}/mvn-repo</url>
-		</repository>
-	</distributionManagement>
-	<description>Propriete is a Java library for abstracting configurations using Java Interface. Heavily inspired by excelent [GWT Constants](http://www.gwtproject.org/doc/latest/DevGuideI18nConstants.html).</description>
-	<name>Propriete</name>
-	<url>http://github.com/gabrielmoreira/propriete</url>
 </project>
