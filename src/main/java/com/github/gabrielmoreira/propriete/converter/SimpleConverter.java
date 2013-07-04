@@ -155,6 +155,7 @@ public class SimpleConverter implements Converter {
 		static {
 			NO_VALUES.add("no");
 			NO_VALUES.add("n");
+			NO_VALUES.add("off");
 			NO_VALUES.add("0");
 			NO_VALUES.add("false");
 		}

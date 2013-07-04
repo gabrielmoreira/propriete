@@ -11,14 +11,22 @@ public class PropertiesConfigSource implements ConfigSource {
 	private Properties properties;
 
 	public PropertiesConfigSource(Properties properties) {
-		this.properties = properties;
+		this(properties, null);
+	}
+
+	public PropertiesConfigSource(Properties properties, PropertyTransformer propertyTransformer) {
+		this.properties = propertyTransformer == null ? properties : propertyTransformer.transform(properties);
 	}
 
 	public Object get(String key) {
 		return properties.getProperty(key);
 	}
 
-	public Set<Entry<String, Object>> filterStartWith(String prefix) {
+	protected Properties getProperties() {
+		return properties;
+	}
+
+	public Map<String, Object> filterStartWith(String prefix) {
 		Set<Entry<Object, Object>> entrySet = properties.entrySet();
 		Map<String, Object> section = new HashMap<String, Object>();
 		for (Entry<Object, Object> entry : entrySet) {
@@ -26,7 +34,7 @@ public class PropertiesConfigSource implements ConfigSource {
 			if (key.startsWith(prefix))
 				section.put(key, entry.getValue());
 		}
-		return section.entrySet();
+		return section;
 	}
 
 }

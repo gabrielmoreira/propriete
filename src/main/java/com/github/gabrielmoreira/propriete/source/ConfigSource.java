@@ -1,12 +1,11 @@
 package com.github.gabrielmoreira.propriete.source;
 
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Map;
 
 public interface ConfigSource {
 
 	Object get(String key);
 
-	Set<Entry<String, Object>> filterStartWith(String prefix);
+	Map<String, Object> filterStartWith(String prefix);
 
 }

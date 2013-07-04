@@ -1,7 +1,6 @@
 package com.github.gabrielmoreira.propriete;
 
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Map;
 
 import com.github.gabrielmoreira.propriete.converter.Converter;
 import com.github.gabrielmoreira.propriete.placeholder.ConfigPlaceholderResolver;
@@ -31,7 +30,7 @@ public class ConfigContext {
 		return converter.convert(object, propertyType);
 	}
 
-	public Set<Entry<String, Object>> filterStartWith(String prefix) {
+	public Map<String, Object> filterStartWith(String prefix) {
 		return configSource.filterStartWith(prefix);
 	}
 

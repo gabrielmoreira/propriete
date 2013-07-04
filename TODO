@@ -1,4 +1,2 @@
 Others
-- Support ENV/SystemProperties configSources
-- Support composite configSources
 - Support File/Path return types

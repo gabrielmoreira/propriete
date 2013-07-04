@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 public class DynamicConfig implements InvocationHandler {
 
@@ -95,13 +94,12 @@ public class DynamicConfig implements InvocationHandler {
 		}
 
 		public Object execute(Object[] args) {
-			Set<Entry<String, Object>> entries = configContext.filterStartWith(propertyKey);
-			return asProperties(entries);
+			return asProperties(configContext.filterStartWith(propertyKey));
 		}
 
-		private Properties asProperties(Set<Entry<String, Object>> entries) {
+		private Properties asProperties(Map<String, Object> map) {
 			Properties properties = new Properties();
-			for (Entry<String, Object> entry : entries) {
+			for (Entry<String, Object> entry : map.entrySet()) {
 				String key = propertyNewKeyPrefix == null ? entry.getKey() : getKey(entry.getKey());
 				properties.put(key, configContext.resolvePlaceholders(entry.getValue()));
 			}
