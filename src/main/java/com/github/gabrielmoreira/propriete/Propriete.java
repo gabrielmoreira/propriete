@@ -50,4 +50,8 @@ public class Propriete {
 				dynamicConfig);
 	}
 
+	public ConfigContext getConfigContext() {
+		return configContext;
+	}
+
 }

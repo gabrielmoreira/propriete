@@ -103,9 +103,10 @@ public class DynamicConfig implements InvocationHandler {
 			Map<String, Object> section = (Map<String, Object>) (Map) new Properties();
 			PropertyKeyTransformer propertyKeyTransformer = propertyNewKeyPrefix == null ? PropertyKeyTransformer.NOOP : new AddPrefixPropertyKeyTransformer(propertyNewKeyPrefix + delimiter, propertyKey.length() + 1);
 			CreateSectionPropertyVisitor sectionPropertyVisitor = new CreateSectionPropertyVisitor(section, propertyKey, propertyKeyTransformer);
-			configContext.visit(sectionPropertyVisitor);
+			configContext.visit(sectionPropertyVisitor, true);
 			if (required && section.isEmpty())
 				throw new RequiredPropertyException("Property section '" + propertyKey + "' not found!");
+			configContext.resolvePlaceholders(section);
 			return section;
 		}
 	}
@@ -124,13 +125,11 @@ public class DynamicConfig implements InvocationHandler {
 		}
 
 		public Object execute(Object[] args) {
-			Object object = configContext.get(propertyKey);
-			if (object == null)
-				object = defaultValue;
+			Object object = configContext.getAs(propertyKey, true, propertyType, defaultValue);
 			if (object == null && (required || this.propertyType.isPrimitive())) {
 				throw new RequiredPropertyException("Property '" + propertyKey + "' not found!");
 			}
-			return object == null ? null : configContext.convert(configContext.resolvePlaceholders(object), propertyType);
+			return object == null ? null : object;
 		}
 	}
 

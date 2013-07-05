@@ -26,7 +26,7 @@ public class StringSubstitutionPlaceholderResolver implements ConfigPlaceholderR
 		StringBuffer sb = new StringBuffer();
 		while (matcher.find()) {
 			String key = matcher.group(1);
-			Object propertyValue = context.get(key);
+			Object propertyValue = context.get(key, false);
 			String replaceText = (String) context.convert(propertyValue, String.class);
 			if (replaceText == null) {
 				unresolvedKeys.add(key);
