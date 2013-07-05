@@ -5,6 +5,7 @@ import java.util.Map;
 import com.github.gabrielmoreira.propriete.converter.Converter;
 import com.github.gabrielmoreira.propriete.placeholder.ConfigPlaceholderResolver;
 import com.github.gabrielmoreira.propriete.source.ConfigSource;
+import com.github.gabrielmoreira.propriete.visitor.PropertyVisitor;
 
 public class ConfigContext {
 
@@ -31,13 +32,17 @@ public class ConfigContext {
 	}
 
 	public Map<String, Object> filterStartWith(String prefix) {
-		return configSource.filterStartWith(prefix);
+		return configSource.startsWith(prefix);
 	}
 
 	public Object resolvePlaceholders(Object value) {
 		if (placeholderResolver != null)
 			return placeholderResolver.resolvePlaceholders(this, value);
 		return value;
+	}
+
+	public void visit(PropertyVisitor propertyVisitor) {
+		configSource.visit(propertyVisitor);
 	}
 
 }

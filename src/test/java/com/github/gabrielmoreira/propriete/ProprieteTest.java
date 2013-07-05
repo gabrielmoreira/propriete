@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ProprieteTest {
 
 	@Test
-	public void simple() {
+	public void shouldReturnSimpleValues() {
 		// given
 		Properties properties = new Properties();
 		properties.put("value", "123");
@@ -24,7 +24,7 @@ public class ProprieteTest {
 	}
 
 	@Test
-	public void nested() {
+	public void shouldReturnNestedValues() {
 		// given
 		Properties properties = new Properties();
 		properties.put("nested.value", "123");
@@ -36,7 +36,7 @@ public class ProprieteTest {
 	}
 
 	@Test(expected = RequiredPropertyException.class)
-	public void notFound() {
+	public void shouldThrowsExceptionWhenPropertyNotFound() {
 		// given
 		Properties properties = new Properties();
 		// when
@@ -44,7 +44,7 @@ public class ProprieteTest {
 	}
 
 	@Test
-	public void getSection() {
+	public void shouldFilterAndReturnAllPropertiesStartingWithPrefix() {
 		// given
 		Properties properties = new Properties();
 		properties.put("app.database.url", "Alice");
@@ -54,12 +54,12 @@ public class ProprieteTest {
 		// when
 		AppWithSection appWithSection = Propriete.getInstance(AppWithSection.class, properties);
 		// then
-		assertNotNull(appWithSection.getHibernateConfig());
+		assertNotNull(appWithSection.getDatabaseConfig());
 		assertEquals(new HashSet<String>(Arrays.asList("app.database.url", "app.database.pass")), appWithSection.getDatabaseConfig().keySet());
 	}
 
 	@Test
-	public void getSectionWithRename() {
+	public void shouldFilterAndChangePrefixForAllPropertiesStartingWithPrefix() {
 		// given
 		Properties properties = new Properties();
 		properties.put("app.jpa.show_sql", "true");
@@ -70,7 +70,27 @@ public class ProprieteTest {
 		AppWithSection appWithSection = Propriete.getInstance(AppWithSection.class, properties);
 		// then
 		assertNotNull(appWithSection.getHibernateConfig());
+		// [app.jpa].show_sql was renamed to [hibernate].show_sql
 		assertEquals(new HashSet<String>(Arrays.asList("hibernate.show_sql", "hibernate.generateDDL")), appWithSection.getHibernateConfig().keySet());
+	}
+
+	@Test(expected = RequiredPropertyException.class)
+	public void shouldThrowsExceptionWhenRequiredSectionNotFound() {
+		Properties properties = new Properties();
+		// when
+		AppWithSection appWithSection = Propriete.getInstance(AppWithSection.class, properties);
+		// then
+		assertNotNull(appWithSection.getDatabaseConfig());
+	}
+
+	@Test()
+	public void shouldNotThrowsExceptionWhenOptionalSectionNotFound() {
+		Properties properties = new Properties();
+		// when
+		AppWithSection appWithSection = Propriete.getInstance(AppWithSection.class, properties);
+		// then
+		assertNotNull(appWithSection.getHibernateConfig());
+		assertTrue(appWithSection.getHibernateConfig().isEmpty());
 	}
 
 	public interface Simple {
@@ -89,7 +109,7 @@ public class ProprieteTest {
 
 	@Config(prefix = "app")
 	public interface AppWithSection {
-		@ConfigProperty(name = "jpa", newKeyPrefix = "hibernate")
+		@ConfigProperty(name = "jpa", newKeyPrefix = "hibernate", optional = true)
 		Properties getHibernateConfig();
 
 		@ConfigProperty(name = "database")

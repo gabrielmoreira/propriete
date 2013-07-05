@@ -3,14 +3,17 @@ package com.github.gabrielmoreira.propriete.source;
 import java.util.Map;
 import java.util.Properties;
 
+import com.github.gabrielmoreira.propriete.transformer.MapTransformer;
+import com.github.gabrielmoreira.propriete.transformer.SmartMapTransformer;
+
 public class SystemEnvConfigSource extends PropertiesConfigSource implements ConfigSource {
 
 	public SystemEnvConfigSource() {
-		this(new SmartPropertyTransformer());
+		this(new SmartMapTransformer());
 	}
 
-	public SystemEnvConfigSource(PropertyTransformer propertyTransformer) {
-		super(getEnvAsProperties(), propertyTransformer);
+	public SystemEnvConfigSource(MapTransformer mapTransformer) {
+		super(getEnvAsProperties(), mapTransformer);
 	}
 
 	private static Properties getEnvAsProperties() {

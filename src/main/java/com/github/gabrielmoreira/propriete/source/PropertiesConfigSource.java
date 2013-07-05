@@ -1,40 +1,24 @@
 package com.github.gabrielmoreira.propriete.source;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
-public class PropertiesConfigSource implements ConfigSource {
+import com.github.gabrielmoreira.propriete.transformer.MapTransformer;
 
-	private Properties properties;
+public class PropertiesConfigSource extends AbstractMapConfigSource {
 
 	public PropertiesConfigSource(Properties properties) {
 		this(properties, null);
 	}
 
-	public PropertiesConfigSource(Properties properties, PropertyTransformer propertyTransformer) {
-		this.properties = propertyTransformer == null ? properties : propertyTransformer.transform(properties);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public PropertiesConfigSource(Properties properties, MapTransformer mapTransformer) {
+		super((Map) properties, mapTransformer);
 	}
 
-	public Object get(String key) {
-		return properties.getProperty(key);
-	}
-
+	@SuppressWarnings("rawtypes")
 	protected Properties getProperties() {
-		return properties;
-	}
-
-	public Map<String, Object> filterStartWith(String prefix) {
-		Set<Entry<Object, Object>> entrySet = properties.entrySet();
-		Map<String, Object> section = new HashMap<String, Object>();
-		for (Entry<Object, Object> entry : entrySet) {
-			String key = (String) entry.getKey();
-			if (key.startsWith(prefix))
-				section.put(key, entry.getValue());
-		}
-		return section;
+		return (Properties) (Map) getSource();
 	}
 
 }

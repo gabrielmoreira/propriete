@@ -2,23 +2,26 @@ package com.github.gabrielmoreira.propriete.source;
 
 import static org.junit.Assert.*;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
+
+import com.github.gabrielmoreira.propriete.transformer.SmartMapTransformer;
 
 public class SmartPropertyTransformerTest {
 
 	@Test
 	public void shouldCreateSmartProperties() {
 		// given
-		Properties properties = new Properties();
-		properties.put("FULL_Name", "Gabriel");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("FULL_Name", "Gabriel");
 		// when
-		Properties newProperties = new SmartPropertyTransformer().transform(properties);
+		Map<String, Object> newMap = new SmartMapTransformer().transform(map);
 		// then
-		assertEquals("Gabriel", newProperties.get("FULL_Name"));
-		assertEquals("Gabriel", newProperties.get("FULL_NAME"));
-		assertEquals("Gabriel", newProperties.get("full.name"));
-		assertEquals(3, newProperties.size());
+		assertEquals("Gabriel", newMap.get("FULL_Name"));
+		assertEquals("Gabriel", newMap.get("FULL_NAME"));
+		assertEquals("Gabriel", newMap.get("full.name"));
+		assertEquals(3, newMap.size());
 	}
 }

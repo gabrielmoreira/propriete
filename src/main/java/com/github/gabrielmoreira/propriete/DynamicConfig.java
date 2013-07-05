@@ -6,8 +6,11 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
+
+import com.github.gabrielmoreira.propriete.transformer.AddPrefixPropertyKeyTransformer;
+import com.github.gabrielmoreira.propriete.transformer.PropertyKeyTransformer;
+import com.github.gabrielmoreira.propriete.visitor.CreateSectionPropertyVisitor;
 
 public class DynamicConfig implements InvocationHandler {
 
@@ -86,28 +89,24 @@ public class DynamicConfig implements InvocationHandler {
 
 	private class GetSectionConfigExecutionHandler implements ExecutionHandler {
 		private String propertyKey;
+		private boolean required;
 		private String propertyNewKeyPrefix;
 
 		public GetSectionConfigExecutionHandler(PropertyConfigAdapter propertyConfigAdapter) {
 			this.propertyKey = propertyConfigAdapter.getKey();
 			this.propertyNewKeyPrefix = propertyConfigAdapter.getNewKeyPrefix();
+			this.required = propertyConfigAdapter.isRequired();
 		}
 
 		public Object execute(Object[] args) {
-			return asProperties(configContext.filterStartWith(propertyKey));
-		}
-
-		private Properties asProperties(Map<String, Object> map) {
-			Properties properties = new Properties();
-			for (Entry<String, Object> entry : map.entrySet()) {
-				String key = propertyNewKeyPrefix == null ? entry.getKey() : getKey(entry.getKey());
-				properties.put(key, configContext.resolvePlaceholders(entry.getValue()));
-			}
-			return properties;
-		}
-
-		private String getKey(String key) {
-			return buildPath(propertyNewKeyPrefix, key.substring(propertyKey.length() + 1));
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			Map<String, Object> section = (Map<String, Object>) (Map) new Properties();
+			PropertyKeyTransformer propertyKeyTransformer = propertyNewKeyPrefix == null ? PropertyKeyTransformer.NOOP : new AddPrefixPropertyKeyTransformer(propertyNewKeyPrefix + delimiter, propertyKey.length() + 1);
+			CreateSectionPropertyVisitor sectionPropertyVisitor = new CreateSectionPropertyVisitor(section, propertyKey, propertyKeyTransformer);
+			configContext.visit(sectionPropertyVisitor);
+			if (required && section.isEmpty())
+				throw new RequiredPropertyException("Property section '" + propertyKey + "' not found!");
+			return section;
 		}
 	}
 

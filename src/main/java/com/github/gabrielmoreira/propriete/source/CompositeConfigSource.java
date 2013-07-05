@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.github.gabrielmoreira.propriete.filter.PropertyFilter;
+import com.github.gabrielmoreira.propriete.visitor.PropertyVisitor;
+
 public class CompositeConfigSource implements ConfigSource {
 
 	private LinkedList<ConfigSource> sources = new LinkedList<ConfigSource>();
@@ -20,7 +23,7 @@ public class CompositeConfigSource implements ConfigSource {
 		return this;
 	}
 
-	public LinkedList<ConfigSource> getSources() {
+	protected LinkedList<ConfigSource> getSources() {
 		return sources;
 	}
 
@@ -34,11 +37,30 @@ public class CompositeConfigSource implements ConfigSource {
 		return null;
 	}
 
-	public Map<String, Object> filterStartWith(String prefix) {
-		Map<String, Object> section = new HashMap<String, Object>();
+	public Map<String, Object> startsWith(String prefix) {
+		Map<String, Object> filtered = new HashMap<String, Object>();
 		for (ConfigSource configSource : getSources())
-			section.putAll(configSource.filterStartWith(prefix));
-		return section;
+			filtered.putAll(configSource.startsWith(prefix));
+		return filtered;
+	}
+
+	public Map<String, Object> all() {
+		Map<String, Object> filtered = new HashMap<String, Object>();
+		for (ConfigSource configSource : getSources())
+			filtered.putAll(configSource.all());
+		return filtered;
+	}
+
+	public Map<String, Object> filter(PropertyFilter propertyFilter) {
+		Map<String, Object> filtered = new HashMap<String, Object>();
+		for (ConfigSource configSource : getSources())
+			filtered.putAll(configSource.filter(propertyFilter));
+		return filtered;
+	}
+
+	public void visit(PropertyVisitor propertyVisitor) {
+		for (ConfigSource configSource : getSources())
+			configSource.visit(propertyVisitor);
 	}
 
 }
