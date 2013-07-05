@@ -86,11 +86,20 @@ public class ConfigContext {
 	}
 
 	public void visit(final PropertyVisitor propertyVisitor, final boolean resolvePlaceholder) {
-		configSource.visit(resolvePlaceholder ? new PropertyVisitor() {
-			public void visit(String key, Object value) {
-				propertyVisitor.visit(key, resolvePlaceholder ? resolvePlaceholders(value) : value);
-			}
-		} : propertyVisitor);
+		configSource.visit(resolvePlaceholder ? new ResolvePlaceholderPropertyVisitor(propertyVisitor) : propertyVisitor);
+	}
+
+	private class ResolvePlaceholderPropertyVisitor implements PropertyVisitor {
+		private PropertyVisitor visitor;
+
+		public ResolvePlaceholderPropertyVisitor(PropertyVisitor visitor) {
+			this.visitor = visitor;
+		}
+
+		public void visit(String key, Object value) {
+			visitor.visit(key, resolvePlaceholders(value));
+
+		}
 	}
 
 }

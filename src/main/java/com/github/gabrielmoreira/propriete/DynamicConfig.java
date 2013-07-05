@@ -101,7 +101,7 @@ public class DynamicConfig implements InvocationHandler {
 		public Object execute(Object[] args) {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			Map<String, Object> section = (Map<String, Object>) (Map) new Properties();
-			PropertyKeyTransformer propertyKeyTransformer = propertyNewKeyPrefix == null ? PropertyKeyTransformer.NOOP : new AddPrefixPropertyKeyTransformer(propertyNewKeyPrefix + delimiter, propertyKey.length() + 1);
+			PropertyKeyTransformer propertyKeyTransformer = propertyNewKeyPrefix == null ? PropertyKeyTransformer.NOOP : new AddPrefixPropertyKeyTransformer(propertyNewKeyPrefix.isEmpty() ? "" : propertyNewKeyPrefix + delimiter, propertyKey.length() + 1);
 			CreateSectionPropertyVisitor sectionPropertyVisitor = new CreateSectionPropertyVisitor(section, propertyKey, propertyKeyTransformer);
 			configContext.visit(sectionPropertyVisitor, true);
 			if (required && section.isEmpty())
