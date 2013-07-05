@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.github.gabrielmoreira.propriete.ProprieteException;
 import com.github.gabrielmoreira.propriete.filter.PropertyFilter;
 import com.github.gabrielmoreira.propriete.filter.StartsWithPropertyFilter;
 import com.github.gabrielmoreira.propriete.transformer.MapTransformer;
@@ -16,10 +17,12 @@ public abstract class AbstractMapConfigSource implements ConfigSource {
 
 	public AbstractMapConfigSource(Map<String, Object> source) {
 		this.source = source;
+		if (source == null)
+			throw new ProprieteException(new IllegalArgumentException("Source must not be null"));
 	}
 
 	public AbstractMapConfigSource(Map<String, Object> source, MapTransformer mapTransformer) {
-		this.source = mapTransformer == null ? source : mapTransformer.transform(source);
+		this(mapTransformer == null ? source : mapTransformer.transform(source));
 	}
 
 	protected Map<String, Object> getSource() {

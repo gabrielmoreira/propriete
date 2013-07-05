@@ -5,7 +5,7 @@ import com.github.gabrielmoreira.propriete.transformer.MapTransformer;
 public class SystemPropertiesConfigSource extends PropertiesConfigSource {
 
 	public SystemPropertiesConfigSource() {
-		super(null);
+		this(null);
 	}
 
 	public SystemPropertiesConfigSource(MapTransformer mapTransformer) {
