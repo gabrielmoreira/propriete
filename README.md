@@ -31,8 +31,7 @@ The Propriete library is available for maven users:
 
 ```java
 public interface Sample {
-   @ConfigProperty(name="hello")
-   public String greeting();
+   public String hello();
 }
 ```
 ```java
@@ -41,7 +40,23 @@ properties.put("hello", "World!");
 
 Sample sample = Propriete.getInstance(Sample.class, properties);
 
-assertEquals("World!", sample.value());
+assertEquals("World!", sample.hello());
+```
+
+### Simple example (with custom property name)
+```java
+public interface Sample {
+   @ConfigurationProperty(name="helloKey")
+   public String hello();
+}
+```
+```java
+Properties properties = new Properties();
+properties.put("helloKey", "World!");
+
+Sample sample = Propriete.getInstance(Sample.class, properties);
+
+assertEquals("World!", sample.hello());
 ```
 
 See more samples [ProprieteTest.java](https://github.com/gabrielmoreira/propriete/blob/master/src/test/java/com/github/gabrielmoreira/propriete/ProprieteTest.java)
