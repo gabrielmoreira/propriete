@@ -6,7 +6,7 @@
 
 	<groupId>com.github.gabrielmoreira</groupId>
 	<artifactId>propriete</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 
 	<scm>
 		<connection>scm:git:git@github.com:gabrielmoreira/propriete.git</connection>
