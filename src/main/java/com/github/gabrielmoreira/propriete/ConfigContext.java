@@ -4,8 +4,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.github.gabrielmoreira.propriete.converter.Converter;
+import com.github.gabrielmoreira.propriete.converter.SimpleConverter;
 import com.github.gabrielmoreira.propriete.filter.PropertyFilter;
 import com.github.gabrielmoreira.propriete.placeholder.ConfigPlaceholderResolver;
+import com.github.gabrielmoreira.propriete.placeholder.StringSubstitutionPlaceholderResolver;
 import com.github.gabrielmoreira.propriete.source.ConfigSource;
 import com.github.gabrielmoreira.propriete.visitor.PropertyVisitor;
 
@@ -15,13 +17,13 @@ public class ConfigContext {
 	private ConfigSource configSource;
 	private Converter converter;
 
-	public ConfigContext(ConfigSource configSource, Converter converter) {
-		this.configSource = configSource;
-		this.converter = converter;
+	public ConfigContext(ConfigSource configSource) {
+		this(configSource, new SimpleConverter(), new StringSubstitutionPlaceholderResolver());
 	}
 
 	public ConfigContext(ConfigSource configSource, Converter converter, ConfigPlaceholderResolver configPlaceholderResolver) {
-		this(configSource, converter);
+		this.configSource = configSource;
+		this.converter = converter;
 		this.placeholderResolver = configPlaceholderResolver;
 	}
 

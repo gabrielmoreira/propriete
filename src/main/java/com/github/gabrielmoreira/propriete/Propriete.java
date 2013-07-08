@@ -3,8 +3,6 @@ package com.github.gabrielmoreira.propriete;
 import java.lang.reflect.Proxy;
 import java.util.Properties;
 
-import com.github.gabrielmoreira.propriete.converter.SimpleConverter;
-import com.github.gabrielmoreira.propriete.placeholder.StringSubstitutionPlaceholderResolver;
 import com.github.gabrielmoreira.propriete.source.ConfigSource;
 import com.github.gabrielmoreira.propriete.source.PropertiesConfigSource;
 
@@ -19,7 +17,7 @@ public class Propriete {
 	}
 
 	public Propriete(ConfigSource configSource) {
-		this(new ConfigContext(configSource, new SimpleConverter(), new StringSubstitutionPlaceholderResolver()));
+		this(new ConfigContext(configSource));
 	}
 
 	public Propriete(Properties properties) {
