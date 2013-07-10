@@ -104,4 +104,16 @@ public class ConfigContext {
 		}
 	}
 
+	public ConfigSource getConfigSource() {
+		return configSource;
+	}
+
+	public Converter getConverter() {
+		return converter;
+	}
+
+	public ConfigPlaceholderResolver getPlaceholderResolver() {
+		return placeholderResolver;
+	}
+
 }
