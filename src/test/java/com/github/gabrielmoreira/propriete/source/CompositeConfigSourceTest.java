@@ -41,7 +41,7 @@ public class CompositeConfigSourceTest {
 		// given
 		MockConfigSource configSourceA = new MockConfigSource().with("name", "Gabriel");
 		MockConfigSource configSourceB = new MockConfigSource().with("name", "Leonardo");
-		CompositeConfigSource composite = new CompositeConfigSource(configSourceA, configSourceB);
+		CompositeConfigSource composite = CompositeConfigSource.with(configSourceA, configSourceB);
 		// when
 		String name = (String) composite.get("name");
 		// then

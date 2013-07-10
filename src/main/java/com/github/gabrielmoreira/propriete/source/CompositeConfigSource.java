@@ -10,10 +10,18 @@ import com.github.gabrielmoreira.propriete.visitor.PropertyVisitor;
 
 public class CompositeConfigSource implements ConfigSource {
 
-	private LinkedList<ConfigSource> sources = new LinkedList<ConfigSource>();
+	private LinkedList<ConfigSource> sources;
 
-	public CompositeConfigSource(ConfigSource... configSource) {
-		addSource(configSource);
+	public CompositeConfigSource() {
+		this(new LinkedList<ConfigSource>());
+	}
+
+	public CompositeConfigSource(LinkedList<ConfigSource> sources) {
+		this.sources = sources;
+	}
+
+	public static CompositeConfigSource with(ConfigSource... configSource) {
+		return new CompositeConfigSource().addSource(configSource);
 	}
 
 	public CompositeConfigSource addSource(ConfigSource... configSources) {
