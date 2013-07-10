@@ -361,6 +361,7 @@ public class ConfigSourceBuilderTest {
 		loader.file("b2").add("b2", "true");
 		loader.file("c2").add("c2", "true");
 		loader.file("fixed").add("d", "d${b}");
+		loader.file("db");
 		loader.file("db2").add("c", "c2");
 
 		ConfigSourceBuilder builder = new ConfigSourceBuilder(loader);
@@ -382,7 +383,6 @@ public class ConfigSourceBuilderTest {
 		assertEquals("db2", (String) source.get("d"));
 		assertEquals("true", (String) source.get("b2"));
 		assertEquals("true", (String) source.get("c2"));
-		assertFalse(source.all().keySet().contains("c"));
 	}
 
 	@Test
