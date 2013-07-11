@@ -3,6 +3,7 @@ package com.github.gabrielmoreira.propriete;
 import static com.github.gabrielmoreira.propriete.Strings.*;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,8 @@ public class DynamicConfig implements InvocationHandler {
 	private String path;
 	private String delimiter = ".";
 	private Map<Method, ExecutionHandler> executionHandlers = new HashMap<Method, ExecutionHandler>();
+	private final static Object UNSUPPORTED = new Object() {
+	};
 
 	public DynamicConfig(ConfigContext configContext, Class<?> type) {
 		this(configContext, type, null, null);
@@ -58,7 +61,7 @@ public class DynamicConfig implements InvocationHandler {
 			return new GetDynamicConfigExecutionHandler(propertyConfigAdapter);
 		if (propertyConfigAdapter.isSection())
 			return new GetSectionConfigExecutionHandler(propertyConfigAdapter);
-		return new GetPropertyExecutionHandler(propertyConfigAdapter);
+		return new GetPropertyExecutionHandler(propertyConfigAdapter, this);
 	}
 
 	private interface ExecutionHandler {
@@ -100,6 +103,7 @@ public class DynamicConfig implements InvocationHandler {
 
 		public Object execute(Object[] args) {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
+			//TODO Move createSection to ConfigContext
 			Map<String, Object> section = (Map<String, Object>) (Map) new Properties();
 			PropertyKeyTransformer propertyKeyTransformer = propertyNewKeyPrefix == null ? PropertyKeyTransformer.NOOP : new AddPrefixPropertyKeyTransformer(propertyNewKeyPrefix.isEmpty() ? "" : propertyNewKeyPrefix + delimiter, propertyKey.length() + 1);
 			CreateSectionPropertyVisitor sectionPropertyVisitor = new CreateSectionPropertyVisitor(section, propertyKey, propertyKeyTransformer);
@@ -116,21 +120,55 @@ public class DynamicConfig implements InvocationHandler {
 		private Class<?> propertyType;
 		private boolean required;
 		private String defaultValue;
+		private DynamicConfig dynamicConfig;
+		private Method nativeMethod;
 
-		public GetPropertyExecutionHandler(PropertyConfigAdapter propertyConfigAdapter) {
-			this.propertyKey = propertyConfigAdapter.getKey();
-			this.propertyType = propertyConfigAdapter.getType();
-			this.required = propertyConfigAdapter.isRequired();
-			this.defaultValue = propertyConfigAdapter.getDefaultValue();
+		public GetPropertyExecutionHandler(PropertyConfigAdapter propertyConfigAdapter, DynamicConfig dynamicConfig) {
+			this.dynamicConfig = dynamicConfig;
+			this.propertyKey = propertyConfigAdapter.getKey(); // Cache
+			this.propertyType = propertyConfigAdapter.getType(); // Cache
+			this.required = propertyConfigAdapter.isRequired(); // Cache
+			this.defaultValue = propertyConfigAdapter.getDefaultValue(); // Cache
+			this.nativeMethod = getNativeMethod(propertyConfigAdapter.method);
 		}
 
 		public Object execute(Object[] args) {
 			Object object = configContext.getAs(propertyKey, true, propertyType, defaultValue);
 			if (object == null && (required || this.propertyType.isPrimitive())) {
-				throw new RequiredPropertyException("Property '" + propertyKey + "' not found!");
+				// TODO Refactor this ugly hack 
+				Object value = invokeNativeMethod(args);
+				if (value == UNSUPPORTED) {
+					throw new RequiredPropertyException("Property '" + propertyKey + "' not found!");
+				}
+				return value;
 			}
 			return object == null ? null : object;
 		}
+
+		private Method getNativeMethod(Method method) {
+			try {
+				return DynamicConfig.class.getMethod(method.getName(), method.getParameterTypes());
+			} catch (NoSuchMethodException e) {
+				return null;
+			} catch (SecurityException e) {
+				return null;
+			}
+		}
+
+		private Object invokeNativeMethod(Object[] args) {
+			if (nativeMethod == null)
+				return UNSUPPORTED;
+			try {
+				return nativeMethod.invoke(dynamicConfig, args);
+			} catch (IllegalAccessException e) {
+				return UNSUPPORTED;
+			} catch (IllegalArgumentException e) {
+				return UNSUPPORTED;
+			} catch (InvocationTargetException e) {
+				return UNSUPPORTED;
+			}
+		}
+
 	}
 
 	private class PropertyConfigAdapter {
