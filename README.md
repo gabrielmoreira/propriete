@@ -9,10 +9,6 @@ The Propriete library is available for maven users:
     <repository>
         <id>propriete-mvn-repo</id>
         <url>https://raw.github.com/gabrielmoreira/propriete/mvn-repo/</url>
-        <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
     </repository>
 </repositories>
 ```
@@ -21,7 +17,7 @@ The Propriete library is available for maven users:
 <dependency>
   <groupId>com.github.gabrielmoreira</groupId>
   <artifactId>propriete</artifactId>
-  <version>0.0.5-SNAPSHOT</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 

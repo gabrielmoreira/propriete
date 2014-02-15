@@ -28,6 +28,19 @@ class Strings {
 		return value == null || Propriete.DEFAULT_NULL_STRING_VALUE.equals(value);
 	}
 
+	public static boolean isBlank(final CharSequence cs) {
+		int strLen;
+		if (cs == null || (strLen = cs.length()) == 0) {
+			return true;
+		}
+		for (int i = 0; i < strLen; i++) {
+			if (Character.isWhitespace(cs.charAt(i)) == false) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static String toJavaBeanName(String propertyName) {
 		if (propertyName.length() > 3 && propertyName.startsWith("get") && Character.isUpperCase(propertyName.charAt(3)))
 			propertyName = propertyName.substring(3, 4).toLowerCase() + propertyName.substring(4);

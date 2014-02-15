@@ -2,6 +2,7 @@ package com.github.gabrielmoreira.propriete;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import com.github.gabrielmoreira.propriete.converter.Converter;
 import com.github.gabrielmoreira.propriete.converter.SimpleConverter;
@@ -9,6 +10,9 @@ import com.github.gabrielmoreira.propriete.filter.PropertyFilter;
 import com.github.gabrielmoreira.propriete.placeholder.ConfigPlaceholderResolver;
 import com.github.gabrielmoreira.propriete.placeholder.StringSubstitutionPlaceholderResolver;
 import com.github.gabrielmoreira.propriete.source.ConfigSource;
+import com.github.gabrielmoreira.propriete.transformer.AddPrefixPropertyKeyTransformer;
+import com.github.gabrielmoreira.propriete.transformer.PropertyKeyTransformer;
+import com.github.gabrielmoreira.propriete.visitor.CreateSectionPropertyVisitor;
 import com.github.gabrielmoreira.propriete.visitor.PropertyVisitor;
 
 public class ConfigContext {
@@ -36,7 +40,25 @@ public class ConfigContext {
 		if (value == null)
 			value = defaultValue;
 		return resolvePlaceholders ? resolvePlaceholders(value) : value;
+	}
 
+	public Map<String, Object> getSection(String propertyKey) {
+		return getSection(propertyKey, null, null);
+	}
+
+	public Map<String, Object> getSection(String propertyKey, String newPropertyPrefix) {
+		return getSection(propertyKey, newPropertyPrefix, ".");
+	}
+
+	public Map<String, Object> getSection(String propertyKey, String newPropertyPrefix, String delimiter) {
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		Map<String, Object> section = (Map<String, Object>) (Map) new Properties();
+		PropertyKeyTransformer propertyKeyTransformer = Strings.isBlank(newPropertyPrefix) ? PropertyKeyTransformer.NOOP : new AddPrefixPropertyKeyTransformer(newPropertyPrefix + delimiter, propertyKey.length() + 1);
+		CreateSectionPropertyVisitor sectionPropertyVisitor = new CreateSectionPropertyVisitor(section, propertyKey, propertyKeyTransformer);
+		visit(sectionPropertyVisitor, true);
+		if (!section.isEmpty())
+			resolvePlaceholders(section);
+		return section;
 	}
 
 	public <T> T getAs(String propertyKey, boolean resolvePlaceholders, Class<T> type) {

@@ -1,6 +1,7 @@
 package com.github.gabrielmoreira.propriete;
 
-import static com.github.gabrielmoreira.propriete.Strings.*;
+import static com.github.gabrielmoreira.propriete.Strings.normalize;
+import static com.github.gabrielmoreira.propriete.Strings.toJavaBeanName;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -8,10 +9,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import com.github.gabrielmoreira.propriete.transformer.AddPrefixPropertyKeyTransformer;
-import com.github.gabrielmoreira.propriete.transformer.PropertyKeyTransformer;
-import com.github.gabrielmoreira.propriete.visitor.CreateSectionPropertyVisitor;
 
 public class DynamicConfig implements InvocationHandler {
 
@@ -102,15 +99,10 @@ public class DynamicConfig implements InvocationHandler {
 		}
 
 		public Object execute(Object[] args) {
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			//TODO Move createSection to ConfigContext
-			Map<String, Object> section = (Map<String, Object>) (Map) new Properties();
-			PropertyKeyTransformer propertyKeyTransformer = propertyNewKeyPrefix == null ? PropertyKeyTransformer.NOOP : new AddPrefixPropertyKeyTransformer(propertyNewKeyPrefix.isEmpty() ? "" : propertyNewKeyPrefix + delimiter, propertyKey.length() + 1);
-			CreateSectionPropertyVisitor sectionPropertyVisitor = new CreateSectionPropertyVisitor(section, propertyKey, propertyKeyTransformer);
-			configContext.visit(sectionPropertyVisitor, true);
+			Map<String, Object> section = configContext.getSection(propertyKey, propertyNewKeyPrefix, delimiter);
 			if (required && section.isEmpty())
 				throw new RequiredPropertyException("Property section '" + propertyKey + "' not found!");
-			configContext.resolvePlaceholders(section);
+
 			return section;
 		}
 	}

@@ -10,7 +10,7 @@ import com.github.gabrielmoreira.propriete.ProprieteException;
 
 public class StringSubstitutionPlaceholderResolver implements ConfigPlaceholderResolver {
 
-	private Pattern placeholderPattern = Pattern.compile("\\$\\{(.*?)\\}");
+	private Pattern placeholderPattern = Pattern.compile("\\$\\{(.*?)(?::(.*?))?\\}");
 
 	public Object resolvePlaceholders(ConfigContext context, Object value) {
 		if (value == null)
@@ -26,7 +26,10 @@ public class StringSubstitutionPlaceholderResolver implements ConfigPlaceholderR
 		StringBuffer sb = new StringBuffer();
 		while (matcher.find()) {
 			String key = matcher.group(1);
+			String defaultValue = matcher.group(2);
 			Object propertyValue = context.get(key, false);
+			if (propertyValue == null)
+				propertyValue = defaultValue;
 			String replaceText = (String) context.convert(propertyValue, String.class);
 			if (replaceText == null) {
 				unresolvedKeys.add(key);

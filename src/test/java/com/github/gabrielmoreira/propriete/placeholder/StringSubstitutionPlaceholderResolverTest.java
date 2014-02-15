@@ -23,6 +23,17 @@ public class StringSubstitutionPlaceholderResolverTest {
 	}
 
 	@Test
+	public void shouldUseDefaultPlaceholder() {
+		assertEquals("Hello Gabriel da silva!", configContext.resolvePlaceholders("Hello ${name:Gabriel da silva}!"));
+	}
+
+	@Test
+	public void shouldNotUseDefaultPlaceholder() {
+		properties.put("name", "Gabriel");
+		assertEquals("Hello Gabriel!", configContext.resolvePlaceholders("Hello ${name:Fulano}!"));
+	}
+
+	@Test
 	public void shouldReplaceMorePlaceholders() {
 		properties.put("hi", "Hello");
 		properties.put("name", "Gabriel");
